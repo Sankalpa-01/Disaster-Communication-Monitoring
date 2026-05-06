@@ -1,0 +1,26 @@
+# Python Environments
+venv/
+env/
+.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables (SECURITY RISK if pushed)
+.env
+.env.*
+
+# Data sets (Keep the folders, but ignore the massive CSV files)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# Model Weights (Crucial: do not push massive .pth files to GitHub)
+ml/weights/*.pt
+ml/weights/*.pth
+!ml/weights/.gitkeep
+
+# OS generated files
+.DS_Store
+Thumbs.db
