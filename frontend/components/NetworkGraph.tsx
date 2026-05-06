@@ -301,8 +301,8 @@ export default function NetworkGraph({ packets, disasterState }: { packets: Pack
   useEffect(() => {
     if (!svgRef.current || packets.length === 0) return;
 
-    const width = 800;
-    const height = 500;
+    const width = 350;
+    const height = 600;
     const margin = 40;
 
     const svg = d3.select(svgRef.current)
