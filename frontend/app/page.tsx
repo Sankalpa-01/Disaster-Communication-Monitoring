@@ -180,30 +180,43 @@
 
 "use client";
 
-import { useMemo } from "react";
 import { useTrafficStream } from "../hooks/useTrafficStream";
 import ControlPanel from "../components/ControlPanel";
 import NetworkGraph from "../components/NetworkGraph";
 import TopMetrics from "../components/TopMetrics";
 import BottomConsole from "../components/BottomConsole";
 import TopologyMap from "../components/TopologyMap";
+import { useState } from "react";
 
 export default function CommandCenter() {
+  const [severity, setSeverity] = useState<number>(1);
+  const [networkLoad, setNetworkLoad] = useState<number>(50);
+
+  // 2. NOW you can pass those variables to the hook
   const {
-    networkState, severity, livePackets, isConnected,
-    triggerDisaster, resetNetwork, setSeverity,
+    networkState, 
+    livePackets, 
+    isConnected,
+    triggerDisaster, 
+    resetNetwork, 
     intelligence
-  } = useTrafficStream();
+  } = useTrafficStream(severity, networkLoad);
+
+  // Create a safe default object to prevent 'undefined' crashes
+  const safeIntelligence = intelligence || {
+    resilience: 100, breakdown: 0, survivability: "STABLE", 
+    emergencyChannels: 0, failedNodes: 0, confidence: 100,
+    alerts: [], decisions: [], timer: "STABLE", zones: []
+  };
 
   const isDisaster = networkState === "DISASTER";
 
   return (
-    // Futuristic scanline/grid background
     <main className="flex h-screen w-full bg-[#030712] text-slate-300 overflow-hidden font-sans relative">
-      {/* Subtle background grid */}
+      {/* Background Grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:40px_40px] opacity-20 pointer-events-none"></div>
 
-      {/* LEFT PANEL: User Controls (Fixed Width 320px) */}
+      {/* LEFT PANEL: User Controls */}
       <div className="w-[320px] shrink-0 h-full p-3 z-10 flex flex-col">
         <ControlPanel 
           networkState={networkState} severity={severity} setSeverity={setSeverity}
@@ -214,27 +227,26 @@ export default function CommandCenter() {
       {/* CENTER COLUMN: Metrics, Geographical Map, Console */}
       <div className="flex-1 flex flex-col h-full p-3 pl-0 gap-3 min-w-0 z-10">
         
-        {/* TOP ROW: 8 Metric Cards */}
+        {/* TOP ROW: Metrics */}
         <div className="shrink-0">
-          <TopMetrics packets={livePackets} intelligence={intelligence} isDisaster={isDisaster} />
+          <TopMetrics packets={livePackets} intelligence={safeIntelligence} isDisaster={isDisaster} />
         </div>
 
-        {/* MIDDLE: The Unified Geographical Map */}
+        {/* MIDDLE: Geographical Map */}
         <div className="flex-1 min-h-0 bg-[#0B1120]/80 backdrop-blur-md border border-slate-800/80 rounded-xl p-4 flex flex-col relative shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-          <TopologyMap intelligence={intelligence} />
+          <TopologyMap intelligence={safeIntelligence} />
         </div>
 
         {/* BOTTOM: AI Decision Console */}
         <div className="h-[220px] shrink-0 bg-[#0B1120]/80 backdrop-blur-md border border-slate-800/80 rounded-xl p-4 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
-          <BottomConsole intelligence={intelligence} />
+          {/* We pass the whole intelligence object; BottomConsole now handles its own log mapping */}
+          <BottomConsole intelligence={safeIntelligence} />
         </div>
-
       </div>
 
-      {/* RIGHT PANEL: AI Contour Map (Fixed Width 350px) */}
+      {/* RIGHT PANEL: AI Contour Map */}
       <div className="w-[350px] shrink-0 h-full p-3 pl-0 z-10 flex flex-col">
         <div className="w-full h-full bg-[#0B1120]/80 backdrop-blur-md border border-slate-800/80 rounded-xl p-4 flex flex-col shadow-[0_0_30px_rgba(0,0,0,0.5)] relative overflow-hidden">
-          
           <div className="mb-2 shrink-0 z-10 flex justify-between items-start">
             <div>
               <h2 className="text-sm font-bold text-cyan-400 uppercase tracking-widest">AI Embeddings</h2>
@@ -249,10 +261,8 @@ export default function CommandCenter() {
           <div className="flex-1 -mx-4 -mb-4 relative">
             <NetworkGraph packets={livePackets} disasterState={networkState} />
           </div>
-
         </div>
       </div>
-
     </main>
   );
 }

@@ -293,13 +293,17 @@
 import { useEffect, useRef } from "react";
 import * as d3 from "d3";
 import { contourDensity } from "d3-contour";
-import { Packet } from "../hooks/useTrafficStream";
+
+interface Packet {
+  category: string;
+  coordinates?: [number, number];
+}
 
 export default function NetworkGraph({ packets, disasterState }: { packets: Packet[], disasterState: string }) {
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    if (!svgRef.current || packets.length === 0) return;
+    if (!svgRef.current || !packets || packets.length === 0) return;
 
     const width = 350;
     const height = 600;
