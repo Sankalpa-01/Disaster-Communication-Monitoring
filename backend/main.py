@@ -45,6 +45,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from api.routes import router as api_router
+import uvicorn
 
 app = FastAPI(title="OmniRoute AI Backend")
 
